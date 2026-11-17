@@ -1,0 +1,4 @@
+interface:
+  display_name: "复制月报表格"
+  short_description: "生成可粘贴的月报表格，支持本月截至今天排期、法定日历和任务日期重叠"
+  default_prompt: "使用 $copy-monthly-report-table 将月报工作明细按本月截至今天的实际工作日排期，排除放假日期并纳入调休上班日，允许任务日期重复，生成表格并复制到剪贴板，同时在对话中展示完整表格。"
