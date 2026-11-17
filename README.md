@@ -17,6 +17,8 @@
 
 ## 在线安装
 
+[在 skills.sh 查看本技能](https://skills.sh/xiaohuizli/copy-monthly-report-table/copy-monthly-report-table)。
+
 ```zsh
 npx skills add xiaohuizli/copy-monthly-report-table --skill copy-monthly-report-table --agent codex --global -y
 ```
