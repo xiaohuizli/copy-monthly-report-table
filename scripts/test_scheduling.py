@@ -82,7 +82,7 @@ class SchedulingTests(unittest.TestCase):
             result = subprocess.run(base + ["--end-date", "2026-10-23"], capture_output=True, text=True, check=True)
             lines = [line.split("\t") for line in result.stdout.splitlines()]
             self.assertEqual(len(lines), 2)
-            self.assertTrue(all(len(line) == 8 and line[5:7] == ["2026-10-08", "2026-10-08"] for line in lines))
+            self.assertTrue(all(len(line) == 9 and line[6:8] == ["2026-10-08", "2026-10-08"] for line in lines))
             result = subprocess.run(base + ["--end-date", "2026-10-07"], capture_output=True, text=True)
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(result.stdout, "")

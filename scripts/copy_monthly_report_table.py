@@ -19,6 +19,19 @@ from zoneinfo import ZoneInfo
 from work_calendar import DEFAULT_CALENDAR, WorkCalendar
 
 
+TSV_HEADERS = (
+    "开发平台",
+    "人员",
+    "协作人员",
+    "工作岗位",
+    "工作内容",
+    "预估天数",
+    "开始时间",
+    "完成时间",
+    "完成状态",
+)
+TSV_CELL_TRANSLATION = str.maketrans("\t\r\n", "   ")
+
 
 @dataclass
 class WorkRow:
@@ -28,6 +41,7 @@ class WorkRow:
     start: str
     end: str
     status: str = ""
+    collaborators: str = ""
 
 
 def read_text(path: Path) -> str:
@@ -40,7 +54,7 @@ def read_text(path: Path) -> str:
 
 
 def split_md_row(line: str) -> list[str]:
-    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+    return [cell.strip() for cell in line.strip().removeprefix("|").removesuffix("|").split("|")]
 
 
 def parse_markdown_table(text: str) -> list[WorkRow]:
@@ -67,8 +81,9 @@ def parse_markdown_table(text: str) -> list[WorkRow]:
                 content=clean_content(content),
                 estimate=row.get("预估天数") or "",
                 start=row.get("开始时间") or "",
-                end=row.get("结束时间") or "",
-                status=row.get("状态") or "",
+                end=row.get("完成时间") or row.get("结束时间") or "",
+                status=row.get("完成状态") or row.get("状态") or "",
+                collaborators=clean_content(row.get("协作人员") or ""),
             )
         )
     return rows
@@ -155,11 +170,20 @@ def assign_dates(rows: list[WorkRow], first_day: date, last_day: date | None = N
 
 
 def build_tsv(rows: list[WorkRow], person: str, role: str, status: str | None, include_header: bool) -> str:
-    lines: list[str] = []
-    if include_header:
-        lines.append("\t".join(["开发平台", "人员", "岗位", "工作内容", "预估天数", "开始时间", "结束时间", "状态"]))
+    lines = ["\t".join(TSV_HEADERS)] if include_header else []
     for row in rows:
-        lines.append("\t".join([row.platform, person, role, row.content, row.estimate, row.start, row.end, clean_content(status or row.status or "完成")]))
+        cells = (
+            row.platform,
+            person,
+            row.collaborators,
+            role,
+            row.content,
+            row.estimate,
+            row.start,
+            row.end,
+            clean_content(status or row.status or "完成"),
+        )
+        lines.append("\t".join(cell.translate(TSV_CELL_TRANSLATION) for cell in cells))
     return "\n".join(lines)
 
 
